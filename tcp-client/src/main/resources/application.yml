@@ -1,0 +1,19 @@
+server:
+  port: 8081
+
+tcp:
+  client:
+    server:
+      host: localhost
+      port: 8888
+    connect:
+      timeout: 5000
+    download:
+      directory: downloads
+
+logging:
+  level:
+    com.example.tcpclient: DEBUG
+    io.netty: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

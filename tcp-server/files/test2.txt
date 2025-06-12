@@ -1,0 +1,5 @@
+这是测试文件2的内容。
+包含更多的文本数据用于测试文件传输功能。
+支持中文和英文混合内容。
+File transfer test with mixed content.
+测试完成！
