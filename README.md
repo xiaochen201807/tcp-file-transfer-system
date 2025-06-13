@@ -57,25 +57,62 @@ tcp-demo/
 ## 快速开始
 
 ### 环境要求
-- Java 17+
+- Java 1.8+
 - Maven 3.6+
 
-### 1. 启动服务端
+### JDK 1.8 特别说明
+本分支专门为JDK 1.8环境优化，主要调整包括：
+- Spring Boot版本：2.7.18（兼容JDK 1.8）
+- 使用 `javax.annotation` 替代 `jakarta.annotation`
+- 移除JDK 10+的 `var` 关键字
+- 使用传统的HashMap构造方式替代 `Map.of()`
+
+### 1. 确认JDK版本
+
+```bash
+# 确认Java版本为1.8
+java -version
+# 应该显示: java version "1.8.0_xxx"
+```
+
+### 2. 启动服务端
 
 ```bash
 cd tcp-server
+mvn clean compile
 mvn spring-boot:run
+```
+
+或使用提供的JDK 1.8启动脚本：
+```bash
+# Windows
+start-server-jdk8.bat
+
+# Linux/Mac
+chmod +x start-server-jdk8.sh
+./start-server-jdk8.sh
 ```
 
 服务端将在以下端口启动：
 - TCP服务器：8888端口
 - HTTP服务器：8080端口
 
-### 2. 启动客户端
+### 3. 启动客户端
 
 ```bash
 cd tcp-client
+mvn clean compile
 mvn spring-boot:run
+```
+
+或使用提供的JDK 1.8启动脚本：
+```bash
+# Windows
+start-client-jdk8.bat
+
+# Linux/Mac
+chmod +x start-client-jdk8.sh
+./start-client-jdk8.sh
 ```
 
 客户端将在8081端口启动HTTP服务器。
@@ -156,9 +193,47 @@ logging:
 
 ## 故障排除
 
+### 通用问题
 1. **连接失败**：检查服务端是否已启动，端口是否被占用
 2. **文件下载失败**：检查文件是否存在于服务端files目录
 3. **权限问题**：确保应用有读写文件的权限
+
+### JDK 1.8 特有问题
+4. **编译错误 "找不到符号: 类 var"**：
+   - 确认使用JDK 1.8环境
+   - 检查代码中是否误用了JDK 10+的var关键字
+
+5. **注解错误 "程序包jakarta.annotation不存在"**：
+   - 确认使用的是jdk-1.8分支
+   - 应该使用javax.annotation而不是jakarta.annotation
+
+6. **Map.of() 方法不存在**：
+   - JDK 1.8不支持Map.of()方法
+   - 使用new HashMap<>()方式创建Map
+
+7. **内存不足错误**：
+   ```bash
+   # 设置Maven内存参数
+   export MAVEN_OPTS="-Xmx512m -Xms256m"
+   # 或在Windows中
+   set MAVEN_OPTS=-Xmx512m -Xms256m
+   ```
+
+## 版本对比
+
+| 特性 | main分支 (JDK 17+) | jdk-1.8分支 (JDK 1.8+) |
+|------|-------------------|----------------------|
+| Java版本 | 17+ | 1.8+ |
+| Spring Boot | 3.2.0 | 2.7.18 |
+| 注解包 | jakarta.* | javax.* |
+| 语法特性 | var关键字、Map.of() | 传统语法 |
+| 性能 | 更优 | 良好 |
+| 兼容性 | 现代环境 | 传统环境 |
+
+## 分支说明
+
+- **[main分支](../../tree/main)**: 使用最新的JDK 17和Spring Boot 3.x，适合现代Java开发环境
+- **[jdk-1.8分支](../../tree/jdk-1.8)**: 兼容JDK 1.8的版本，适合传统Java环境或有特定版本要求的项目
 
 ## 扩展功能
 
@@ -169,3 +244,16 @@ logging:
 - 文件分片传输
 - 断点续传
 - 文件加密传输
+
+## 贡献指南
+
+1. Fork本仓库
+2. 根据您的Java环境选择合适的分支
+3. 创建功能分支: `git checkout -b feature/your-feature`
+4. 提交更改: `git commit -am 'Add some feature'`
+5. 推送分支: `git push origin feature/your-feature`
+6. 提交Pull Request
+
+## 许可证
+
+本项目采用MIT许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
