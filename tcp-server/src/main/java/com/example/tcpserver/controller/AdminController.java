@@ -1,6 +1,7 @@
 package com.example.tcpserver.controller;
 
 import com.example.tcpserver.handler.FileTransferHandler;
+import com.example.tcpserver.protocol.FileTransferProtocol;
 import com.example.tcpserver.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -86,7 +88,7 @@ public class AdminController {
     public ResponseEntity<Map<String, Object>> getFileStats() {
         Map<String, Object> stats = new HashMap<>();
         
-        var fileList = fileService.getFileList();
+        List<FileTransferProtocol.FileInfo> fileList = fileService.getFileList();
         stats.put("totalFiles", fileList.size());
         stats.put("totalFilesServed", FileTransferHandler.getTotalFilesServed());
         

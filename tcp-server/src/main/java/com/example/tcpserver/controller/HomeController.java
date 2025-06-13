@@ -51,8 +51,12 @@ public class HomeController {
 
         html.append("<div class=\"info\">");
         html.append("<h3>服务器信息</h3>");
-        html.append("<p><strong>TCP服务端口:</strong> ").append(tcpPort).append(" <span class=\"status\">运行中</span></p>");
-        html.append("<p><strong>HTTP管理端口:</strong> ").append(httpPort).append(" <span class=\"status\">运行中</span></p>");
+        html.append("<p><strong>TCP服务端口:</strong> ");
+        html.append(tcpPort);
+        html.append(" <span class=\"status\">运行中</span></p>");
+        html.append("<p><strong>HTTP管理端口:</strong> ");
+        html.append(httpPort);
+        html.append(" <span class=\"status\">运行中</span></p>");
         html.append("<p><strong>协议:</strong> 自定义二进制协议 + HTTP REST API</p>");
         html.append("</div>");
 
@@ -82,7 +86,9 @@ public class HomeController {
 
         html.append("<div class=\"info\">");
         html.append("<h3>使用说明</h3>");
-        html.append("<p>1. TCP客户端可以连接到端口 ").append(tcpPort).append(" 进行文件传输</p>");
+        html.append("<p>1. TCP客户端可以连接到端口 ");
+        html.append(tcpPort);
+        html.append(" 进行文件传输</p>");
         html.append("<p>2. 点击上面的链接查看服务器状态和统计信息</p>");
         html.append("<p>3. 文件存储在 <code>files/</code> 目录中</p>");
         html.append("<p>4. 支持高并发连接和文件传输</p>");
@@ -105,13 +111,13 @@ public class HomeController {
         info.put("version", "1.0.0");
         info.put("tcpPort", tcpPort);
         info.put("httpPort", httpPort);
-        info.put("endpoints", Map.of(
-            "status", "/admin/status",
-            "clients", "/admin/clients", 
-            "fileStats", "/admin/files/stats",
-            "health", "/admin/health",
-            "system", "/admin/system"
-        ));
+        Map<String, String> endpoints = new HashMap<>();
+        endpoints.put("status", "/admin/status");
+        endpoints.put("clients", "/admin/clients");
+        endpoints.put("fileStats", "/admin/files/stats");
+        endpoints.put("health", "/admin/health");
+        endpoints.put("system", "/admin/system");
+        info.put("endpoints", endpoints);
         return info;
     }
 }
