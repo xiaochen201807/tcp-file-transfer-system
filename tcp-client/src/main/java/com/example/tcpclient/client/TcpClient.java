@@ -135,7 +135,9 @@ public class TcpClient {
      */
     public CompletableFuture<String> requestFileList() {
         if (!isConnected()) {
-            return CompletableFuture.failedFuture(new RuntimeException("Not connected to server"));
+            CompletableFuture<String> future = new CompletableFuture<>();
+            future.completeExceptionally(new RuntimeException("Not connected to server"));
+            return future;
         }
         
         FileTransferProtocol.Message request = new FileTransferProtocol.Message(
@@ -143,7 +145,7 @@ public class TcpClient {
             new byte[0]
         );
         
-        return clientHandler.sendRequest(channel.pipeline().context(clientHandler), request)
+        CompletableFuture<String> future = clientHandler.sendRequest(channel.pipeline().context(clientHandler), request)
             .thenApply(response -> {
                 if (response.getType() == FileTransferProtocol.MSG_TYPE_FILE_LIST) {
                     return new String(response.getData());
@@ -152,8 +154,10 @@ public class TcpClient {
                 } else {
                     throw new RuntimeException("Unexpected response type: " + response.getType());
                 }
-            })
-            .orTimeout(30, TimeUnit.SECONDS);
+            });
+
+        // JDK 1.8兼容的超时处理
+        return addTimeout(future, 30, TimeUnit.SECONDS);
     }
     
     /**
@@ -161,7 +165,9 @@ public class TcpClient {
      */
     public CompletableFuture<byte[]> downloadFile(String fileName) {
         if (!isConnected()) {
-            return CompletableFuture.failedFuture(new RuntimeException("Not connected to server"));
+            CompletableFuture<byte[]> future = new CompletableFuture<>();
+            future.completeExceptionally(new RuntimeException("Not connected to server"));
+            return future;
         }
         
         FileTransferProtocol.Message request = new FileTransferProtocol.Message(
@@ -169,7 +175,7 @@ public class TcpClient {
             fileName
         );
         
-        return clientHandler.sendRequest(channel.pipeline().context(clientHandler), request)
+        CompletableFuture<byte[]> future = clientHandler.sendRequest(channel.pipeline().context(clientHandler), request)
             .thenApply(response -> {
                 if (response.getType() == FileTransferProtocol.MSG_TYPE_FILE_DATA) {
                     return response.getData();
@@ -178,7 +184,37 @@ public class TcpClient {
                 } else {
                     throw new RuntimeException("Unexpected response type: " + response.getType());
                 }
-            })
-            .orTimeout(60, TimeUnit.SECONDS);
+            });
+
+        // JDK 1.8兼容的超时处理
+        return addTimeout(future, 60, TimeUnit.SECONDS);
+    }
+
+    /**
+     * JDK 1.8兼容的超时处理方法
+     */
+    private <T> CompletableFuture<T> addTimeout(CompletableFuture<T> future, long timeout, TimeUnit unit) {
+        CompletableFuture<T> timeoutFuture = new CompletableFuture<>();
+
+        // 创建超时任务
+        java.util.concurrent.ScheduledExecutorService scheduler =
+            java.util.concurrent.Executors.newScheduledThreadPool(1);
+
+        java.util.concurrent.ScheduledFuture<?> timeoutTask = scheduler.schedule(() -> {
+            timeoutFuture.completeExceptionally(new java.util.concurrent.TimeoutException("Operation timed out"));
+        }, timeout, unit);
+
+        // 当原始future完成时，取消超时任务并完成结果
+        future.whenComplete((result, throwable) -> {
+            timeoutTask.cancel(false);
+            scheduler.shutdown();
+            if (throwable != null) {
+                timeoutFuture.completeExceptionally(throwable);
+            } else {
+                timeoutFuture.complete(result);
+            }
+        });
+
+        return timeoutFuture;
     }
 }
