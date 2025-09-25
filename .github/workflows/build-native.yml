@@ -436,7 +436,7 @@ jobs:
         cd release
         for dir in */; do
           platform=$(basename "$dir")
-          zip -r "${{ platform }}.zip" "$platform"
+          zip -r "${platform}.zip" "$platform"
         done
 
     - name: Upload release assets
