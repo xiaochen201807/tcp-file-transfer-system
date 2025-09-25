@@ -119,6 +119,7 @@ jobs:
         path: .
 
     - name: Restore target directories
+      shell: bash
       run: |
         # 检查下载的artifact结构
         ls -la
@@ -156,6 +157,7 @@ jobs:
         mvn package -Pnative -DskipTests -Dmaven.compiler.skip=true -Dversion=${{ needs.compile.outputs.version }}
 
     - name: Copy external configs
+      shell: bash
       run: |
         if [ -f "response-config-external.json" ]; then
           cp response-config-external.json tcp-server/target/response-config.json
@@ -165,10 +167,12 @@ jobs:
         fi
 
     - name: Create release directory
+      shell: bash
       run: |
         mkdir -p release/${{ matrix.platform }}-${{ matrix.arch }}
 
     - name: Copy binaries
+      shell: bash
       run: |
         cp tcp-server/target/tcp-server-native${{ matrix.extension }} release/${{ matrix.platform }}-${{ matrix.arch }}/tcp-server-native${{ matrix.extension }}
         cp tcp-client/target/tcp-client-native${{ matrix.extension }} release/${{ matrix.platform }}-${{ matrix.arch }}/tcp-client-native${{ matrix.extension }}
