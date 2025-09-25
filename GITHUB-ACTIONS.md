@@ -137,6 +137,10 @@ strategy:
   - 升级 `actions/download-artifact` 到 v4
   - 升级 `actions/cache` 到 v4
   - 替换 `actions/upload-release-asset` 为 `softprops/action-gh-release`
+- **2025-09-25**: 修复GraalVM安装问题
+  - 使用 `temurin` 作为基础JDK
+  - 使用 `graalvm/setup-graalvm` 安装native-image
+  - 添加强制构建选项
 
 ## 📚 相关文档
 
