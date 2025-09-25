@@ -118,33 +118,7 @@ jobs:
         name: compiled-classes
         path: .
 
-    - name: Restore target directories
-      shell: bash
-      run: |
-        # 检查下载的artifact结构
-        ls -la
-        echo "=== tcp-server structure ==="
-        ls -la tcp-server/ || echo "tcp-server not found"
-        echo "=== tcp-client structure ==="
-        ls -la tcp-client/ || echo "tcp-client not found"
-        
-        # 确保target目录存在
-        mkdir -p tcp-server/target
-        mkdir -p tcp-client/target
-        
-        # 如果classes目录在target下，直接使用
-        # 如果classes目录在根目录下，移动到target
-        if [ -d "tcp-server/target/classes" ]; then
-          echo "Classes already in correct location"
-        elif [ -d "tcp-server/classes" ]; then
-          mv tcp-server/classes tcp-server/target/
-        fi
-        
-        if [ -d "tcp-client/target/classes" ]; then
-          echo "Classes already in correct location"
-        elif [ -d "tcp-client/classes" ]; then
-          mv tcp-client/classes tcp-client/target/
-        fi
+
 
     - name: Build Server Native
       run: |

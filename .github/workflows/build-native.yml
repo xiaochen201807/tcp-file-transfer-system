@@ -389,10 +389,10 @@ jobs:
         - 构建时间: $(date)
         
         ## 文件说明
-        - \`tcp-server-native${{ matrix.extension }}\`: TCP服务端
-        - \`tcp-client-native${{ matrix.extension }}\`: TCP客户端
-        - \`checksums.txt\`: 文件校验和
-        - \`start-*.bat/sh\`: 启动脚本
+        - `tcp-server-native${{ matrix.extension }}`: TCP服务端
+        - `tcp-client-native${{ matrix.extension }}`: TCP客户端
+        - `checksums.txt`: 文件校验和
+        - `start-*.bat/sh`: 启动脚本
         
         ## 使用方法
         ${{ matrix.platform == 'windows' && '运行 start-server.bat 启动服务端，运行 start-client.bat 启动客户端' || '运行 ./start-server.sh 启动服务端，运行 ./start-client.sh 启动客户端' }}
@@ -427,7 +427,7 @@ jobs:
       shell: bash
       run: |
         mkdir -p release
-        for dir in artifacts/native-binaries-*/; do
+        for dir in artifacts/native-binaries-*/;
           platform=$(basename "$dir")
           cp -r "$dir" "release/$platform"
         done
@@ -436,7 +436,7 @@ jobs:
         cd release
         for dir in */; do
           platform=$(basename "$dir")
-          zip -r "${platform}.zip" "$platform"
+          zip -r "${{ platform }}.zip" "$platform"
         done
 
     - name: Upload release assets
