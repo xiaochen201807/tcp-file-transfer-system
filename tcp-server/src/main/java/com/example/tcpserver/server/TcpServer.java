@@ -1,8 +1,8 @@
 package com.example.tcpserver.server;
 
-import com.example.tcpserver.codec.MessageDecoder;
-import com.example.tcpserver.codec.MessageEncoder;
-import com.example.tcpserver.handler.FileTransferHandler;
+import com.example.tcpserver.codec.TcpProtocolDecoder;
+import com.example.tcpserver.codec.TcpProtocolEncoder;
+import com.example.tcpserver.handler.TcpProtocolHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -27,7 +27,7 @@ public class TcpServer {
     private int port;
     
     @Autowired
-    private FileTransferHandler fileTransferHandler;
+    private TcpProtocolHandler tcpProtocolHandler;
     
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -54,11 +54,11 @@ public class TcpServer {
                         ChannelPipeline pipeline = ch.pipeline();
                         
                         // 添加编解码器
-                        pipeline.addLast(new MessageDecoder());
-                        pipeline.addLast(new MessageEncoder());
+                        pipeline.addLast(new TcpProtocolDecoder());
+                        pipeline.addLast(new TcpProtocolEncoder());
                         
                         // 添加业务处理器
-                        pipeline.addLast(fileTransferHandler);
+                        pipeline.addLast(tcpProtocolHandler);
                     }
                 });
             

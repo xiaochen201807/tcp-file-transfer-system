@@ -1,0 +1,26 @@
+# GraalVM Native Image Dockerfile for Podman
+FROM ghcr.io/graalvm/graalvm-community:17
+
+# 安装必要的工具
+RUN gu install native-image
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制项目文件
+COPY . .
+
+# 构建服务端
+WORKDIR /app/tcp-server
+RUN ./mvnw clean package -Pnative -DskipTests
+
+# 构建客户端
+WORKDIR /app/tcp-client
+RUN ./mvnw clean package -Pnative -DskipTests
+
+# 设置启动脚本
+WORKDIR /app
+COPY docker-run.sh .
+RUN chmod +x docker-run.sh
+
+CMD ["./docker-run.sh"]

@@ -1,0 +1,58 @@
+{
+  "signin": {
+    "success": {
+      "status": 0,
+      "template": "🎉 签到成功！时间：{timestamp}"
+    },
+    "failed": {
+      "status": 1,
+      "template": "❌ 签到失败：{reason}"
+    }
+  },
+  "business": {
+    "query": {
+      "success": {
+        "status": 0,
+        "template": "📊 查询结果：{data} - 处理时间：{timestamp}"
+      },
+      "failed": {
+        "status": 1,
+        "template": "❌ 查询失败：{reason}"
+      }
+    },
+    "update": {
+      "success": {
+        "status": 0,
+        "template": "✅ 更新成功：{data} - 更新时间：{timestamp}"
+      },
+      "failed": {
+        "status": 1,
+        "template": "❌ 更新失败：{reason}"
+      }
+    },
+    "delete": {
+      "success": {
+        "status": 0,
+        "template": "🗑️ 删除成功：{data} - 删除时间：{timestamp}"
+      },
+      "failed": {
+        "status": 1,
+        "template": "❌ 删除失败：{reason}"
+      }
+    },
+    "unknown": {
+      "status": 1,
+      "template": "❓ 未知交易码：{code}"
+    }
+  },
+  "error": {
+    "unknown_transaction_type": {
+      "status": 1,
+      "template": "❓ 未知交易类型：{type}"
+    },
+    "invalid_request": {
+      "status": 1,
+      "template": "❌ 无效请求：{reason}"
+    }
+  }
+}

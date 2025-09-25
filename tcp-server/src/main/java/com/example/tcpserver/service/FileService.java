@@ -1,6 +1,5 @@
 package com.example.tcpserver.service;
 
-import com.example.tcpserver.protocol.FileTransferProtocol;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,8 +25,8 @@ public class FileService {
     /**
      * 获取文件列表
      */
-    public List<FileTransferProtocol.FileInfo> getFileList() {
-        List<FileTransferProtocol.FileInfo> fileList = new ArrayList<>();
+    public List<FileInfo> getFileList() {
+        List<FileInfo> fileList = new ArrayList<>();
         
         try {
             Path dirPath = Paths.get(fileDirectory);
@@ -44,7 +43,7 @@ public class FileService {
             if (files != null) {
                 for (File file : files) {
                     if (file.isFile()) {
-                        FileTransferProtocol.FileInfo fileInfo = new FileTransferProtocol.FileInfo(
+                        FileInfo fileInfo = new FileInfo(
                             file.getName(),
                             file.length(),
                             file.lastModified()

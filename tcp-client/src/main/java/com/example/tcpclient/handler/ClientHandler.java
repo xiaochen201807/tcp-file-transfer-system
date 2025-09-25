@@ -1,23 +1,21 @@
 package com.example.tcpclient.handler;
 
-import com.example.tcpclient.protocol.FileTransferProtocol;
+import com.example.tcpclient.protocol.TcpProtocol;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 客户端处理器
  */
 @Slf4j
-public class ClientHandler extends SimpleChannelInboundHandler<FileTransferProtocol.Message> {
+public class ClientHandler extends SimpleChannelInboundHandler<TcpProtocol.Message> {
     
-    private final AtomicLong requestId = new AtomicLong(0);
-    private final ConcurrentHashMap<Long, CompletableFuture<FileTransferProtocol.Message>> pendingRequests = new ConcurrentHashMap<>();
-    private CompletableFuture<FileTransferProtocol.Message> currentRequest;
+    private final ConcurrentHashMap<Long, CompletableFuture<TcpProtocol.Message>> pendingRequests = new ConcurrentHashMap<>();
+    private CompletableFuture<TcpProtocol.Message> currentRequest;
     
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -43,21 +41,31 @@ public class ClientHandler extends SimpleChannelInboundHandler<FileTransferProto
     }
     
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FileTransferProtocol.Message msg) throws Exception {
-        log.debug("Received message type: {}", msg.getType());
+    protected void channelRead0(ChannelHandlerContext ctx, TcpProtocol.Message msg) throws Exception {
+        log.debug("Received message: isRequest={}, length={}", msg.isRequest(), msg.getLength());
         
-        if (currentRequest != null && !currentRequest.isDone()) {
-            currentRequest.complete(msg);
-            currentRequest = null;
+        if (msg.isRequest()) {
+            // 收到请求报文（通常客户端不会收到请求）
+            log.warn("Received unexpected request message");
         } else {
-            log.warn("Received unexpected message: {}", msg.getType());
+            // 收到响应报文
+            TcpProtocol.ResponseHeader responseHeader = msg.getResponseHeader();
+            log.info("Received response: status={}, data={}", 
+                    responseHeader.getStatus(), new String(msg.getData()));
+            
+            if (currentRequest != null && !currentRequest.isDone()) {
+                currentRequest.complete(msg);
+                currentRequest = null;
+            } else {
+                log.warn("Received unexpected response message");
+            }
         }
     }
     
     /**
      * 发送请求并等待响应
      */
-    public CompletableFuture<FileTransferProtocol.Message> sendRequest(ChannelHandlerContext ctx, FileTransferProtocol.Message request) {
+    public CompletableFuture<TcpProtocol.Message> sendRequest(ChannelHandlerContext ctx, TcpProtocol.Message request) {
         if (currentRequest != null && !currentRequest.isDone()) {
             return CompletableFuture.failedFuture(new RuntimeException("Another request is in progress"));
         }

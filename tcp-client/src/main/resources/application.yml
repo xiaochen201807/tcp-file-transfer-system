@@ -10,6 +10,8 @@ tcp:
       timeout: 5000
     download:
       directory: downloads
+    sender:
+      nodeId: CLIENT
 
 logging:
   level:

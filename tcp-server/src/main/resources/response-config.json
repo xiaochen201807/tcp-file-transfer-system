@@ -1,0 +1,58 @@
+{
+  "signin": {
+    "success": {
+      "status": 0,
+      "template": "Sign in successful at {timestamp}"
+    },
+    "failed": {
+      "status": 1,
+      "template": "Sign in failed: {reason}"
+    }
+  },
+  "business": {
+    "query": {
+      "success": {
+        "status": 0,
+        "template": "Query result: {data} - processed at {timestamp}"
+      },
+      "failed": {
+        "status": 1,
+        "template": "Query failed: {reason}"
+      }
+    },
+    "update": {
+      "success": {
+        "status": 0,
+        "template": "Update result: {data} - updated at {timestamp}"
+      },
+      "failed": {
+        "status": 1,
+        "template": "Update failed: {reason}"
+      }
+    },
+    "delete": {
+      "success": {
+        "status": 0,
+        "template": "Delete result: {data} - deleted at {timestamp}"
+      },
+      "failed": {
+        "status": 1,
+        "template": "Delete failed: {reason}"
+      }
+    },
+    "unknown": {
+      "status": 1,
+      "template": "Unknown transaction code: {code}"
+    }
+  },
+  "error": {
+    "unknown_transaction_type": {
+      "status": 1,
+      "template": "Unknown transaction type: {type}"
+    },
+    "invalid_request": {
+      "status": 1,
+      "template": "Invalid request: {reason}"
+    }
+  }
+}

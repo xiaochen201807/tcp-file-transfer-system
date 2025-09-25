@@ -47,13 +47,13 @@ public class HomeController {
         html.append("</head>");
         html.append("<body>");
         html.append("<div class=\"container\">");
-        html.append("<h1>TCP File Transfer Server</h1>");
+        html.append("<h1>TCP Protocol Server</h1>");
 
         html.append("<div class=\"info\">");
         html.append("<h3>服务器信息</h3>");
         html.append("<p><strong>TCP服务端口:</strong> ").append(tcpPort).append(" <span class=\"status\">运行中</span></p>");
         html.append("<p><strong>HTTP管理端口:</strong> ").append(httpPort).append(" <span class=\"status\">运行中</span></p>");
-        html.append("<p><strong>协议:</strong> 自定义二进制协议 + HTTP REST API</p>");
+        html.append("<p><strong>协议:</strong> 自定义TCP协议 (header+length+data) + HTTP REST API</p>");
         html.append("</div>");
 
         html.append("<div class=\"api-list\">");
@@ -67,8 +67,16 @@ public class HomeController {
         html.append("<a href=\"/admin/clients\" target=\"_blank\">/admin/clients</a>");
         html.append("</div>");
         html.append("<div class=\"api-item\">");
+        html.append("<strong>协议统计:</strong> ");
+        html.append("<a href=\"/admin/protocol/stats\" target=\"_blank\">/admin/protocol/stats</a>");
+        html.append("</div>");
+        html.append("<div class=\"api-item\">");
         html.append("<strong>文件统计:</strong> ");
         html.append("<a href=\"/admin/files/stats\" target=\"_blank\">/admin/files/stats</a>");
+        html.append("</div>");
+        html.append("<div class=\"api-item\">");
+        html.append("<strong>模拟场景:</strong> ");
+        html.append("<a href=\"/api/simulation/scenarios\" target=\"_blank\">/api/simulation/scenarios</a>");
         html.append("</div>");
         html.append("<div class=\"api-item\">");
         html.append("<strong>健康检查:</strong> ");
@@ -82,10 +90,11 @@ public class HomeController {
 
         html.append("<div class=\"info\">");
         html.append("<h3>使用说明</h3>");
-        html.append("<p>1. TCP客户端可以连接到端口 ").append(tcpPort).append(" 进行文件传输</p>");
-        html.append("<p>2. 点击上面的链接查看服务器状态和统计信息</p>");
-        html.append("<p>3. 文件存储在 <code>files/</code> 目录中</p>");
-        html.append("<p>4. 支持高并发连接和文件传输</p>");
+        html.append("<p>1. TCP客户端可以连接到端口 ").append(tcpPort).append(" 进行协议通信</p>");
+        html.append("<p>2. 支持签到交易和业务交易两种类型</p>");
+        html.append("<p>3. 点击上面的链接查看服务器状态和统计信息</p>");
+        html.append("<p>4. 支持配置文件驱动的模拟场景测试</p>");
+        html.append("<p>5. 文件存储在 <code>files/</code> 目录中</p>");
         html.append("</div>");
         html.append("</div>");
         html.append("</body>");
@@ -101,14 +110,16 @@ public class HomeController {
     @ResponseBody
     public Map<String, Object> apiInfo() {
         Map<String, Object> info = new HashMap<>();
-        info.put("serverName", "TCP File Transfer Server");
-        info.put("version", "1.0.0");
+        info.put("serverName", "TCP Protocol Server");
+        info.put("version", "2.0.0");
         info.put("tcpPort", tcpPort);
         info.put("httpPort", httpPort);
         info.put("endpoints", Map.of(
             "status", "/admin/status",
             "clients", "/admin/clients", 
+            "protocolStats", "/admin/protocol/stats",
             "fileStats", "/admin/files/stats",
+            "simulation", "/api/simulation/scenarios",
             "health", "/admin/health",
             "system", "/admin/system"
         ));

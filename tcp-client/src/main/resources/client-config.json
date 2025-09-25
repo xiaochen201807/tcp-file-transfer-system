@@ -1,0 +1,19 @@
+{
+  "tcp": {
+    "client": {
+      "server": {
+        "host": "localhost",
+        "port": 8888
+      },
+      "connect": {
+        "timeout": 5000
+      },
+      "download": {
+        "directory": "downloads"
+      },
+      "sender": {
+        "nodeId": "CLIENT"
+      }
+    }
+  }
+}
