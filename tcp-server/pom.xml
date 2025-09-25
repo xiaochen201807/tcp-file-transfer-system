@@ -47,12 +47,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.experimental</groupId>
-            <artifactId>spring-native</artifactId>
-            <version>0.12.2</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
@@ -73,38 +67,47 @@
                     </excludes>
                 </configuration>
             </plugin>
-            
-            <plugin>
-                <groupId>org.graalvm.buildtools</groupId>
-                <artifactId>native-maven-plugin</artifactId>
-                <version>0.9.28</version>
-                <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <id>build-native</id>
-                        <goals>
-                            <goal>compile-no-fork</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <imageName>tcp-server-native</imageName>
-                    <mainClass>com.example.tcpserver.TcpServerApplication</mainClass>
-                    <buildArgs>
-                        <buildArg>-H:ReflectionConfigurationFiles=src/main/resources/META-INF/native-image/reflect-config.json</buildArg>
-                        <buildArg>-H:ResourceConfigurationFiles=src/main/resources/META-INF/native-image/resource-config.json</buildArg>
-                        <buildArg>-H:JNIConfigurationFiles=src/main/resources/META-INF/native-image/jni-config.json</buildArg>
-                        <buildArg>--enable-http</buildArg>
-                        <buildArg>--enable-https</buildArg>
-                        <buildArg>--initialize-at-build-time=io.netty</buildArg>
-                        <buildArg>--initialize-at-run-time=com.example.tcpserver</buildArg>
-                        <buildArg>--trace-class-initialization=io.netty</buildArg>
-                        <buildArg>--allow-incomplete-classpath</buildArg>
-                        <buildArg>--report-unsupported-elements-at-runtime</buildArg>
-                    </buildArgs>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>0.9.28</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <imageName>tcp-server-native</imageName>
+                            <mainClass>com.example.tcpserver.TcpServerApplication</mainClass>
+                            <buildArgs>
+                                <buildArg>-H:ReflectionConfigurationFiles=src/main/resources/META-INF/native-image/reflect-config.json</buildArg>
+                                <buildArg>-H:ResourceConfigurationFiles=src/main/resources/META-INF/native-image/resource-config.json</buildArg>
+                                <buildArg>-H:JNIConfigurationFiles=src/main/resources/META-INF/native-image/jni-config.json</buildArg>
+                                <buildArg>--enable-http</buildArg>
+                                <buildArg>--enable-https</buildArg>
+                                <buildArg>--initialize-at-build-time=io.netty</buildArg>
+                                <buildArg>--initialize-at-run-time=com.example.tcpserver</buildArg>
+                                <buildArg>--trace-class-initialization=io.netty</buildArg>
+                                <buildArg>--allow-incomplete-classpath</buildArg>
+                                <buildArg>--report-unsupported-elements-at-runtime</buildArg>
+                            </buildArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
