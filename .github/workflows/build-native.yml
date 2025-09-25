@@ -151,6 +151,7 @@ jobs:
         path: .
 
     - name: Restore target directories
+      shell: bash
       run: |
         # 检查下载的artifact结构
         ls -la
@@ -178,6 +179,7 @@ jobs:
         fi
 
     - name: Verify compilation
+      shell: bash
       run: |
         echo "Verifying server compilation..."
         ls -la tcp-server/target/classes/
@@ -259,6 +261,7 @@ jobs:
         path: .
 
     - name: Restore target directories
+      shell: bash
       run: |
         # 检查下载的artifact结构
         ls -la
@@ -296,6 +299,7 @@ jobs:
         mvn package -Pnative -DskipTests -Dmaven.compiler.skip=true -Dversion=${{ needs.compile.outputs.version }}
 
     - name: Copy external configs
+      shell: bash
       run: |
         if [ -f "response-config-external.json" ]; then
           cp response-config-external.json tcp-server/target/response-config.json
@@ -305,10 +309,12 @@ jobs:
         fi
 
     - name: Create release directory
+      shell: bash
       run: |
         mkdir -p release/${{ matrix.platform }}-${{ matrix.arch }}
 
     - name: Copy binaries
+      shell: bash
       run: |
         cp tcp-server/target/tcp-server-native${{ matrix.extension }} release/${{ matrix.platform }}-${{ matrix.arch }}/tcp-server-native${{ matrix.extension }}
         cp tcp-client/target/tcp-client-native${{ matrix.extension }} release/${{ matrix.platform }}-${{ matrix.arch }}/tcp-client-native${{ matrix.extension }}
@@ -318,6 +324,7 @@ jobs:
         cp tcp-client/target/client-config.json release/${{ matrix.platform }}-${{ matrix.arch }}/ 2>/dev/null || true
 
     - name: Optimize binaries
+      shell: bash
       run: |
         # 生成校验和
         cd release/${{ matrix.platform }}-${{ matrix.arch }}
@@ -331,6 +338,7 @@ jobs:
         fi
 
     - name: Create startup scripts
+      shell: bash
       run: |
         if [ "${{ matrix.platform }}" = "windows" ]; then
           cat > release/${{ matrix.platform }}-${{ matrix.arch }}/start-server.bat << 'EOF'
@@ -369,6 +377,7 @@ jobs:
         fi
 
     - name: Create README
+      shell: bash
       run: |
         cat > release/${{ matrix.platform }}-${{ matrix.arch }}/README.md << EOF
         # TCP Demo Native Binaries
@@ -415,6 +424,7 @@ jobs:
         path: artifacts/
 
     - name: Create release archive
+      shell: bash
       run: |
         mkdir -p release
         for dir in artifacts/native-binaries-*/; do
