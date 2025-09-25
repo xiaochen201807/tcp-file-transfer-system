@@ -1,0 +1,22 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "\\Qapplication.yml\\E"
+      },
+      {
+        "pattern": "\\Qclient-config.json\\E"
+      },
+      {
+        "pattern": "\\Qclient-config-external.json\\E"
+      },
+      {
+        "pattern": "\\Qtemplates/.*\\E"
+      },
+      {
+        "pattern": "\\Qstatic/.*\\E"
+      }
+    ]
+  },
+  "bundles": []
+}

@@ -98,6 +98,11 @@
                         <buildArg>--initialize-at-build-time=io.netty</buildArg>
                         <buildArg>--initialize-at-run-time=com.example.tcpclient</buildArg>
                         <buildArg>--trace-class-initialization=io.netty</buildArg>
+                        <buildArg>--allow-incomplete-classpath</buildArg>
+                        <buildArg>--report-unsupported-elements-at-runtime</buildArg>
+                        <buildArg>--enable-monitoring=heapdump,jfr</buildArg>
+                        <buildArg>--enable-url-protocols=http,https</buildArg>
+                        <buildArg>--enable-all-security-services</buildArg>
                     </buildArgs>
                 </configuration>
             </plugin>

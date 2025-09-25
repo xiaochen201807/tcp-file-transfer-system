@@ -1,0 +1,7 @@
+{
+  "name": "com.example.tcpserver",
+  "allDeclaredClasses": true,
+  "allDeclaredConstructors": true,
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true
+}

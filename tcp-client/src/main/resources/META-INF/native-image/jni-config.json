@@ -1,0 +1,7 @@
+{
+  "name": "com.example.tcpclient",
+  "allDeclaredClasses": true,
+  "allDeclaredConstructors": true,
+  "allDeclaredMethods": true,
+  "allDeclaredFields": true
+}
