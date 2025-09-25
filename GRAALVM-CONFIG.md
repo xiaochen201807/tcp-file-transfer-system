@@ -85,7 +85,9 @@
 
 | 参数 | 说明 |
 |------|------|
-| `--no-fallback` | 禁用fallback模式，确保生成纯native image |
+| `-H:ReflectionConfigurationFiles` | 指定反射配置文件路径 |
+| `-H:ResourceConfigurationFiles` | 指定资源访问配置文件路径 |
+| `-H:JNIConfigurationFiles` | 指定JNI配置文件路径 |
 | `--enable-http` | 启用HTTP协议支持 |
 | `--enable-https` | 启用HTTPS协议支持 |
 | `--initialize-at-build-time=io.netty` | 在构建时初始化Netty类 |
@@ -93,9 +95,8 @@
 | `--trace-class-initialization=io.netty` | 跟踪Netty类的初始化 |
 | `--allow-incomplete-classpath` | 允许不完整的类路径 |
 | `--report-unsupported-elements-at-runtime` | 在运行时报告不支持的元素 |
-| `--enable-monitoring=heapdump,jfr` | 启用监控功能 |
-| `--enable-url-protocols=http,https` | 启用URL协议支持 |
-| `--enable-all-security-services` | 启用所有安全服务 |
+
+**注意**: 移除了 `--no-fallback` 参数，使用fallback模式提高兼容性。
 
 ## 🚀 构建命令
 
@@ -161,3 +162,8 @@ mvn package -Pnative -DskipTests
   - 添加资源访问配置文件
   - 添加JNI配置文件
   - 优化Maven构建参数
+- **2025-09-25**: 进一步优化
+  - 移除 `--no-fallback` 参数，使用fallback模式
+  - 添加Spring Boot Native支持依赖
+  - 明确指定配置文件路径
+  - 简化构建参数

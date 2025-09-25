@@ -153,6 +153,11 @@ strategy:
   - 添加资源访问配置文件 (`resource-config.json`)
   - 添加JNI配置文件 (`jni-config.json`)
   - 优化GraalVM构建参数
+- **2025-09-25**: 进一步优化GraalVM配置
+  - 移除 `--no-fallback` 参数，使用fallback模式提高兼容性
+  - 添加Spring Boot Native支持依赖
+  - 明确指定配置文件路径
+  - 简化构建参数，移除可能导致问题的复杂选项
 
 ## 📚 相关文档
 

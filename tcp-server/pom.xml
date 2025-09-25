@@ -47,6 +47,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.experimental</groupId>
+            <artifactId>spring-native</artifactId>
+            <version>0.12.2</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
@@ -68,7 +74,6 @@
                 </configuration>
             </plugin>
             
-            <!-- GraalVM Native Image Plugin -->
             <plugin>
                 <groupId>org.graalvm.buildtools</groupId>
                 <artifactId>native-maven-plugin</artifactId>
@@ -87,7 +92,9 @@
                     <imageName>tcp-server-native</imageName>
                     <mainClass>com.example.tcpserver.TcpServerApplication</mainClass>
                     <buildArgs>
-                        <buildArg>--no-fallback</buildArg>
+                        <buildArg>-H:ReflectionConfigurationFiles=src/main/resources/META-INF/native-image/reflect-config.json</buildArg>
+                        <buildArg>-H:ResourceConfigurationFiles=src/main/resources/META-INF/native-image/resource-config.json</buildArg>
+                        <buildArg>-H:JNIConfigurationFiles=src/main/resources/META-INF/native-image/jni-config.json</buildArg>
                         <buildArg>--enable-http</buildArg>
                         <buildArg>--enable-https</buildArg>
                         <buildArg>--initialize-at-build-time=io.netty</buildArg>
@@ -95,9 +102,6 @@
                         <buildArg>--trace-class-initialization=io.netty</buildArg>
                         <buildArg>--allow-incomplete-classpath</buildArg>
                         <buildArg>--report-unsupported-elements-at-runtime</buildArg>
-                        <buildArg>--enable-monitoring=heapdump,jfr</buildArg>
-                        <buildArg>--enable-url-protocols=http,https</buildArg>
-                        <buildArg>--enable-all-security-services</buildArg>
                     </buildArgs>
                 </configuration>
             </plugin>
