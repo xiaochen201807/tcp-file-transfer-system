@@ -74,14 +74,14 @@ jobs:
         echo "key=${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}" >> $GITHUB_OUTPUT
 
     - name: Cache Maven dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.m2
         key: ${{ steps.cache-key.outputs.key }}
         restore-keys: ${{ runner.os }}-m2
 
     - name: Cache GraalVM build cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cache/graalvm/
@@ -102,7 +102,7 @@ jobs:
         mvn clean compile -DskipTests -Dversion=${{ steps.version.outputs.version }}
 
     - name: Upload compiled classes
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: compiled-classes
         path: |
@@ -129,14 +129,14 @@ jobs:
         java-version: '17'
 
     - name: Cache Maven dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.m2
         key: ${{ needs.compile.outputs.cache-key }}
         restore-keys: ${{ runner.os }}-m2
 
     - name: Download compiled classes
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: compiled-classes
         path: .
@@ -172,7 +172,7 @@ jobs:
         java-version: '17'
 
     - name: Cache Maven dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.m2
         key: ${{ needs.compile.outputs.cache-key }}
@@ -183,7 +183,7 @@ jobs:
         mvn org.owasp:dependency-check-maven:check
 
     - name: Upload security report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-report
         path: |
@@ -236,14 +236,14 @@ jobs:
         components: 'native-image'
 
     - name: Cache Maven dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.m2
         key: ${{ needs.compile.outputs.cache-key }}
         restore-keys: ${{ runner.os }}-m2
 
     - name: Cache GraalVM build cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cache/graalvm/
@@ -254,7 +254,7 @@ jobs:
           ${{ runner.os }}-
 
     - name: Download compiled classes
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: compiled-classes
         path: .
@@ -375,7 +375,7 @@ jobs:
         EOF
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: native-binaries-${{ matrix.platform }}-${{ matrix.arch }}
         path: release/${{ matrix.platform }}-${{ matrix.arch }}/
@@ -391,7 +391,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: artifacts/
 
@@ -411,14 +411,31 @@ jobs:
         done
 
     - name: Upload release assets
-      uses: actions/upload-release-asset@v1
+      uses: softprops/action-gh-release@v1
+      with:
+        files: release/*.zip
+        tag_name: ${{ github.event.release.tag_name }}
+        name: Native Binaries ${{ github.event.release.tag_name }}
+        body: |
+          ## 🚀 Native Binaries Release
+          
+          ### 📦 包含的平台
+          - Windows x64
+          - Linux x64  
+          - Linux ARM64
+          - macOS x64
+          - macOS ARM64
+          
+          ### 🔧 使用方法
+          1. 下载对应平台的zip文件
+          2. 解压到本地目录
+          3. 运行启动脚本
+          
+          ### 🌐 访问地址
+          - 服务端管理: http://localhost:8080/admin/status
+          - 客户端界面: http://localhost:8081
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: release/
-        asset_name: native-binaries-${{ github.event.release.tag_name }}
-        asset_content_type: application/zip
 
   notify:
     needs: [check-changes, build-native, create-release]
