@@ -1,0 +1,185 @@
+name: Build Native Binaries - Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_build:
+        description: 'Force full build (ignore change detection)'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  MAVEN_OPTS: "-Xmx2g -XX:+UseG1GC"
+  NATIVE_IMAGE_OPTS: "--no-fallback --enable-http --enable-https"
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+      version: ${{ steps.version.outputs.version }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install GraalVM Native Image
+      uses: graalvm/setup-graalvm@v1
+      with:
+        java-version: '17'
+        distribution: 'graalvm'
+        components: 'native-image'
+
+    - name: Generate version
+      id: version
+      run: |
+        echo "version=test-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        echo "key=${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}" >> $GITHUB_OUTPUT
+
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ steps.cache-key.outputs.key }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Compile Server
+      run: |
+        cd tcp-server
+        mvn clean compile -DskipTests -Dversion=${{ steps.version.outputs.version }}
+
+    - name: Compile Client
+      run: |
+        cd tcp-client
+        mvn clean compile -DskipTests -Dversion=${{ steps.version.outputs.version }}
+
+    - name: Upload compiled classes
+      uses: actions/upload-artifact@v4
+      with:
+        name: compiled-classes
+        path: |
+          tcp-server/target/classes/
+          tcp-client/target/classes/
+        retention-days: 1
+
+  build-native:
+    needs: compile
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+            arch: x64
+            extension: .exe
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            extension: ""
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install GraalVM Native Image
+      uses: graalvm/setup-graalvm@v1
+      with:
+        java-version: '17'
+        distribution: 'graalvm'
+        components: 'native-image'
+
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ needs.compile.outputs.cache-key }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Download compiled classes
+      uses: actions/download-artifact@v4
+      with:
+        name: compiled-classes
+        path: .
+
+    - name: Restore target directories
+      run: |
+        # 检查下载的artifact结构
+        ls -la
+        echo "=== tcp-server structure ==="
+        ls -la tcp-server/ || echo "tcp-server not found"
+        echo "=== tcp-client structure ==="
+        ls -la tcp-client/ || echo "tcp-client not found"
+        
+        # 确保target目录存在
+        mkdir -p tcp-server/target
+        mkdir -p tcp-client/target
+        
+        # 如果classes目录在target下，直接使用
+        # 如果classes目录在根目录下，移动到target
+        if [ -d "tcp-server/target/classes" ]; then
+          echo "Classes already in correct location"
+        elif [ -d "tcp-server/classes" ]; then
+          mv tcp-server/classes tcp-server/target/
+        fi
+        
+        if [ -d "tcp-client/target/classes" ]; then
+          echo "Classes already in correct location"
+        elif [ -d "tcp-client/classes" ]; then
+          mv tcp-client/classes tcp-client/target/
+        fi
+
+    - name: Build Server Native
+      run: |
+        cd tcp-server
+        mvn package -Pnative -DskipTests -Dmaven.compiler.skip=true -Dversion=${{ needs.compile.outputs.version }}
+
+    - name: Build Client Native
+      run: |
+        cd tcp-client
+        mvn package -Pnative -DskipTests -Dmaven.compiler.skip=true -Dversion=${{ needs.compile.outputs.version }}
+
+    - name: Copy external configs
+      run: |
+        if [ -f "response-config-external.json" ]; then
+          cp response-config-external.json tcp-server/target/response-config.json
+        fi
+        if [ -f "client-config-external.json" ]; then
+          cp client-config-external.json tcp-client/target/client-config.json
+        fi
+
+    - name: Create release directory
+      run: |
+        mkdir -p release/${{ matrix.platform }}-${{ matrix.arch }}
+
+    - name: Copy binaries
+      run: |
+        cp tcp-server/target/tcp-server-native${{ matrix.extension }} release/${{ matrix.platform }}-${{ matrix.arch }}/tcp-server-native${{ matrix.extension }}
+        cp tcp-client/target/tcp-client-native${{ matrix.extension }} release/${{ matrix.platform }}-${{ matrix.arch }}/tcp-client-native${{ matrix.extension }}
+        
+        # Copy configs
+        cp tcp-server/target/response-config.json release/${{ matrix.platform }}-${{ matrix.arch }}/ 2>/dev/null || true
+        cp tcp-client/target/client-config.json release/${{ matrix.platform }}-${{ matrix.arch }}/ 2>/dev/null || true
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: native-binaries-${{ matrix.platform }}-${{ matrix.arch }}
+        path: release/${{ matrix.platform }}-${{ matrix.arch }}/
+        retention-days: 30
