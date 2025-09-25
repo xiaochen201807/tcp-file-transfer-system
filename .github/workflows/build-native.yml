@@ -291,12 +291,12 @@ jobs:
     - name: Build Server Native
       run: |
         cd tcp-server
-        mvn package -Pnative -DskipTests -Dmaven.compiler.skip=true -Dversion=${{ needs.compile.outputs.version }}
+        mvn package -Pnative -DskipTests "-Dmaven.compiler.skip=true" "-Dversion=${{ needs.compile.outputs.version }}"
 
     - name: Build Client Native
       run: |
         cd tcp-client
-        mvn package -Pnative -DskipTests -Dmaven.compiler.skip=true -Dversion=${{ needs.compile.outputs.version }}
+        mvn package -Pnative -DskipTests "-Dmaven.compiler.skip=true" "-Dversion=${{ needs.compile.outputs.version }}"
 
     - name: Copy external configs
       shell: bash
